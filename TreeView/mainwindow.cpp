@@ -5,7 +5,7 @@
 #include "global.h"
 #include "richtextdelegate.h"
 #ifdef CUSTOM_MODEL
-#include "treemodel.hpp"
+#include "treemodel.h"
 #else
 #include "standarditem.h"
 #include "standardtreemodel.h"
@@ -60,13 +60,41 @@ QAction *createAction(const QString &icon, const QString &text,
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+#ifndef CUSTOM_MODEL
+    timedItem(0),
+#endif
+    currentIcon(0)
 {
     ui->setupUi(this);
     createModelAndView();
     createActions();
     createMenusAndToolBar();
     createConnections();
+#ifdef CUSTOM_MODEL
+    setWindowTitle(tr("%1 (Custom Model)[*]")
+                   .arg(QApplication::applicationName()));
+#else
+    setWindowTitle(tr("%1 (QStandardItemModel)[*]")
+                   .arg(QApplication::applicationName()));
+#endif
+    statusBar()->showMessage(tr("Ready"), StatusTimeout);
+
+    timer.setInterval(333);
+    iconTimeLine.setDuration(5000);
+    iconTimeLine.setFrameRange(FirstFrame, LastFrame + 1);
+    iconTimeLine.setLoopCount(0);
+    iconTimeLine.setCurveShape(QTimeLine::LinearCurve);
+    QSettings settings;
+    restoreGeometry(settings.value(GeometrySetting).toByteArray());
+    QString filename = settings.value(FilenameSetting).toString();
+    if (filename.isEmpty())
+        QTimer::singleShot(0, this, SLOT(fileNew()));
+    else
+        QMetaObject::invokeMethod(this, "load", Qt::QueuedConnection,
+                Q_ARG(QString, filename),
+                Q_ARG(QStringList, settings.value(
+                      CurrentTaskPathSetting).toStringList()));
 
 }
 
@@ -217,11 +245,11 @@ void MainWindow::editAdd()
 
 void MainWindow::editAdd()
 {
-    QModelIndex index = treeView->currentIndex();
+    QModelIndex index = ui->treeView->currentIndex();
     if (model->insertRow(0, index)) {
         index = model->index(0, 0, index);
         setCurrentIndex(index);
-        treeView->edit(index);
+        ui->treeView->edit(index);
         setDirty();
         updateUi();
     }
@@ -260,6 +288,65 @@ void MainWindow::editDelete()
     setDirty();
     updateUi();
 }
+
+#ifdef CUSTOM_MODEL
+void MainWindow::editCut()
+{
+    QModelIndex index = ui->treeView->currentIndex();
+    if (model->isTimedItem(index))
+        stopTiming();
+    setCurrentIndex(model->cut(index));
+    editPasteAction->setEnabled(model->hasCutItem());
+}
+
+
+void MainWindow::editPaste()
+{
+    setCurrentIndex(model->paste(ui->treeView->currentIndex()));
+    editHideOrShowDoneTasks(
+            editHideOrShowDoneTasksAction->isChecked());
+}
+
+
+void MainWindow::editMoveUp()
+{
+    ui->treeView->setCurrentIndex(
+            model->moveUp(ui->treeView->currentIndex()));
+    editHideOrShowDoneTasks(
+            editHideOrShowDoneTasksAction->isChecked());
+}
+
+
+void MainWindow::editMoveDown()
+{
+    ui->treeView->setCurrentIndex(
+            model->moveDown(ui->treeView->currentIndex()));
+    editHideOrShowDoneTasks(
+            editHideOrShowDoneTasksAction->isChecked());
+}
+
+
+void MainWindow::editPromote()
+{
+    QModelIndex index = ui->treeView->currentIndex();
+    if (model->isTimedItem(index))
+        stopTiming();
+    setCurrentIndex(model->promote(index));
+    editHideOrShowDoneTasks(
+            editHideOrShowDoneTasksAction->isChecked());
+}
+
+
+void MainWindow::editDemote()
+{
+    QModelIndex index = ui->treeView->currentIndex();
+    if (model->isTimedItem(index))
+        stopTiming();
+    ui->treeView->setCurrentIndex(model->demote(index));
+    editHideOrShowDoneTasks(
+            editHideOrShowDoneTasksAction->isChecked());
+}
+#endif // CUSTOM_MODEL
 
 void MainWindow::editStartOrStop(bool start)
 {
@@ -316,16 +403,6 @@ void MainWindow::editStartOrStop(bool start)
                                          : tr("S&tart"));
     editStartOrStopAction->setIcon(QIcon(start ? tr(":/4.png")
                                                : tr(":/0.png")));
-
-}
-
-void MainWindow::editHideOrShowDoneTasks(bool hide)
-{
-#ifdef CUSTOM_MODEL
-    hideOrShowDoneTask(hide, QModelIndex());
-#else
-    hideOrShowDoneTask(hide, model->invisibleRootItem());
-#endif
 
 }
 
@@ -427,7 +504,7 @@ void MainWindow::createModelAndView()
     //treeView = new QTreeView;
 #ifdef CUSTOM_MODEL
     model = new TreeModel(this);
-    treeView->setDragDropMode(QAbstractItemView::InternalMove);
+    ui->treeView->setDragDropMode(QAbstractItemView::InternalMove);
 #else
     model = new StandardTreeModel(this);
 #endif
@@ -584,13 +661,13 @@ void MainWindow::createConnections()
                 this, qPrintable(i.value()));
     }
 
-//    connect(editStartOrStopAction, SIGNAL(triggered(bool)),
-//            this, SLOT(editStartOrStop(bool)));
-//    connect(editHideOrShowDoneTasksAction, SIGNAL(triggered(bool)),
-//            this, SLOT(editHideOrShowDoneTasks(bool)));
-//    connect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
-//    connect(&iconTimeLine, SIGNAL(frameChanged(int)),
-//            this, SLOT(updateIcon(int)));
+    connect(editStartOrStopAction, SIGNAL(triggered(bool)),
+            this, SLOT(editStartOrStop(bool)));
+    connect(editHideOrShowDoneTasksAction, SIGNAL(triggered(bool)),
+            this, SLOT(editHideOrShowDoneTasks(bool)));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
+    connect(&iconTimeLine, SIGNAL(frameChanged(int)),
+            this, SLOT(updateIcon(int)));
 }
 
 bool MainWindow::okToClearData()
@@ -609,14 +686,40 @@ void MainWindow::setCurrentIndex(const QModelIndex &index)
     }
 }
 
+void MainWindow::editHideOrShowDoneTasks(bool hide)
+{
+#ifdef CUSTOM_MODEL
+    hideOrShowDoneTask(hide, QModelIndex());
+#else
+    hideOrShowDoneTask(hide, model->invisibleRootItem());
+#endif
+}
+
+#ifndef CUSTOM_MODEL
 void MainWindow::hideOrShowDoneTask(bool hide, QStandardItem *item)
 {
     QModelIndex index = item->parent() ? item->parent()->index()
                                        : QModelIndex();
     bool hideThisOne = hide && (item->checkState() == Qt::Checked);
-    ui->treeView->setRowHidden(item->row(), index, hideThisOne);
+    treeView->setRowHidden(item->row(), index, hideThisOne);
     if (!hideThisOne) {
         for (int row = 0; row < item->rowCount(); ++row)
             hideOrShowDoneTask(hide, item->child(row, 0));
     }
 }
+
+#else
+
+void MainWindow::hideOrShowDoneTask(bool hide,
+                                    const QModelIndex &index)
+{
+    bool hideThisOne = hide && model->isChecked(index);
+    if (index.isValid())
+        ui->treeView->setRowHidden(index.row(), index.parent(),
+                               hideThisOne);
+    if (!hideThisOne) {
+        for (int row = 0; row < model->rowCount(index); ++row)
+            hideOrShowDoneTask(hide, model->index(row, 0, index));
+    }
+}
+#endif

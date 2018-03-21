@@ -30,7 +30,9 @@ SOURCES += \
     standarditem.cpp \
     aqp.cpp \
     richtextdelegate.cpp \
-    richtextlineedit.cpp
+    richtextlineedit.cpp \
+    taskitem.cpp \
+    treemodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,10 +41,14 @@ HEADERS += \
     standarditem.h \
     aqp.h \
     richtextdelegate.h \
-    richtextlineedit.h
+    richtextlineedit.h \
+    taskitem.h \
+    treemodel.h
 
 FORMS += \
         mainwindow.ui
 
 RESOURCES += \
     timelog.qrc
+
+DEFINES	    += CUSTOM_MODEL
