@@ -1,0 +1,1 @@
+This example shows how to register a delegate for entier model
