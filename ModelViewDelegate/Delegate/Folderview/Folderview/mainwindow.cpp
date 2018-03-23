@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle( QApplication::applicationName());
 
 
+
 }
 
 MainWindow::~MainWindow()
