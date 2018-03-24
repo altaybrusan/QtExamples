@@ -125,15 +125,13 @@ void MainWindow::createWidgets()
 #else
     directoryCompleter->setModel(new QDirModel(directoryCompleter));
 #endif
-    directoryEdit = new QLineEdit(QDir::toNativeSeparators(
-                                  QDir::homePath()));
+    directoryEdit = new QLineEdit(QDir::toNativeSeparators(QDir::homePath()));
     directoryEdit->setCompleter(directoryCompleter);
     directoryLabel->setBuddy(directoryEdit);
 
     sourceTypeLabel = new QLabel(tr("Source type:"));
     sourceTypeComboBox = new QComboBox;
-    foreach (const QByteArray &ba,
-             QImageReader::supportedImageFormats())
+    foreach (const QByteArray &ba, QImageReader::supportedImageFormats())
         sourceTypeComboBox->addItem(QString(ba).toUpper());
     sourceTypeComboBox->setCurrentIndex(0);
     sourceTypeLabel->setBuddy(sourceTypeComboBox);
