@@ -43,7 +43,7 @@ struct ProgressEvent : public QEvent
 
 
 void convertImages(QObject *receiver, volatile bool *stopped,
-        const QStringList &sourceFiles, const QString &targetType)
+                   const QStringList &sourceFiles, const QString &targetType)
 {
     foreach (const QString &source, sourceFiles) {
         if (*stopped)
@@ -58,9 +58,9 @@ void convertImages(QObject *receiver, volatile bool *stopped,
 
         QString message = saved
                 ? QObject::tr("Saved '%1'")
-                              .arg(QDir::toNativeSeparators(target))
+                  .arg(QDir::toNativeSeparators(target))
                 : QObject::tr("Failed to convert '%1'")
-                              .arg(QDir::toNativeSeparators(source));
+                  .arg(QDir::toNativeSeparators(source));
         QApplication::postEvent(receiver,
                                 new ProgressEvent(saved, message));
     }
@@ -190,7 +190,7 @@ void MainWindow::updateUi()
     if (stopped) {
         convertOrCancelButton->setText(tr("&Convert"));
         convertOrCancelButton->setEnabled(
-                !directoryEdit->text().isEmpty());
+                    !directoryEdit->text().isEmpty());
     }
     else {
         convertOrCancelButton->setText(tr("&Cancel"));
@@ -251,18 +251,18 @@ void MainWindow::convertFiles(const QStringList &sourceFiles)
     total = sourceFiles.count();
     done = 0;
     const QVector<int> sizes = AQP::chunkSizes(sourceFiles.count(),
-            QThread::idealThreadCount());
+                                               QThread::idealThreadCount());
 
     int offset = 0;
     foreach (const int chunkSize, sizes) {
 #ifdef USE_QTCONCURRENT
         QtConcurrent::run(convertImages, this, &stopped,
-                sourceFiles.mid(offset, chunkSize),
-                targetTypeComboBox->currentText());
+                          sourceFiles.mid(offset, chunkSize),
+                          targetTypeComboBox->currentText());
 #else
         ConvertImageTask *convertImageTask = new ConvertImageTask(
-                this, &stopped, sourceFiles.mid(offset, chunkSize),
-                targetTypeComboBox->currentText());
+                    this, &stopped, sourceFiles.mid(offset, chunkSize),
+                    targetTypeComboBox->currentText());
         QThreadPool::globalInstance()->start(convertImageTask);
 #endif
         offset += chunkSize;
@@ -281,7 +281,7 @@ void MainWindow::checkIfDone()
             message = tr("All %n image(s) converted", "", done);
         else
             message = tr("Converted %n/%1 image(s)", "", done)
-                      .arg(total);
+                    .arg(total);
         logEdit->appendPlainText(message);
         stopped = true;
         updateUi();
@@ -314,6 +314,7 @@ bool MainWindow::event(QEvent *event)
     }
     return QMainWindow::event(event);
 }
+
 #endif
 
 

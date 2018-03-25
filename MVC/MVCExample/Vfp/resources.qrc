@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/root">
+        <file>images/connected.png</file>
+        <file>images/disconnected.png</file>
+        <file>images/clear.png</file>
+        <file>images/ibex.png</file>
+        <file>images/receive.png</file>
+        <file>images/send.png</file>
+        <file>images/controlpanel.png</file>
+        <file>images/settings.png</file>
+    </qresource>
+</RCC>

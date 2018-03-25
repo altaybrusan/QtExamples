@@ -97,35 +97,33 @@ public:
 
     SurrogateItem operator()(const SurrogateItem &item)
     {
-//        QScriptEngine javaScriptParser;
-//#if QT_VERSION >= 0x040500
-//        javaScriptParser.globalObject().setProperty("cellRow",
-//                                                    item.row);
-//        javaScriptParser.globalObject().setProperty("cellColumn",
-//                                                    item.column);
-//        javaScriptParser.globalObject().setProperty("cellValue",
-//                                                    item.value);
-//#else
-//        QScriptValue cellRowValue(&javaScriptParser, item.row);
-//        javaScriptParser.globalObject().setProperty("cellRow",
-//                                                    cellRowValue);
-//        QScriptValue cellColumnValue(&javaScriptParser, item.column);
-//        javaScriptParser.globalObject().setProperty("cellColumn",
-//                                                    cellColumnValue);
-//        QScriptValue cellValue(&javaScriptParser, item.value);
-//        javaScriptParser.globalObject().setProperty("cellValue",
-//                                                    cellValue);
-//#endif
-//        QScriptValue result = javaScriptParser.evaluate(script);
-//        if (javaScriptParser.hasUncaughtException()) {
-//            QString error = javaScriptParser.uncaughtException()
-//                            .toString();
-//            errorInfo->add(error);
-//            return item;
-//        }
-//        return SurrogateItem(item.row, item.column,
-//                             result.toNumber());
-        return SurrogateItem();
+        QScriptEngine javaScriptParser;
+#if QT_VERSION >= 0x040500
+        javaScriptParser.globalObject().setProperty("cellRow",
+                                                    item.row);
+        javaScriptParser.globalObject().setProperty("cellColumn",
+                                                    item.column);
+        javaScriptParser.globalObject().setProperty("cellValue",
+                                                    item.value);
+#else
+        QScriptValue cellRowValue(&javaScriptParser, item.row);
+        javaScriptParser.globalObject().setProperty("cellRow",
+                                                    cellRowValue);
+        QScriptValue cellColumnValue(&javaScriptParser, item.column);
+        javaScriptParser.globalObject().setProperty("cellColumn",
+                                                    cellColumnValue);
+        QScriptValue cellValue(&javaScriptParser, item.value);
+        javaScriptParser.globalObject().setProperty("cellValue",
+                                                    cellValue);
+#endif
+        QScriptValue result = javaScriptParser.evaluate(script);
+        if (javaScriptParser.hasUncaughtException()) {
+            QString error = javaScriptParser.uncaughtException()
+                            .toString();
+            errorInfo->add(error);
+            return item;
+        }
+        return SurrogateItem(item.row, item.column,result.toNumber());
     }
 
 private:
@@ -328,8 +326,7 @@ void MainWindow::fileNew()
     model->setRowCount(gridSpecification.rows);
     model->setColumnCount(gridSpecification.columns);
     for (int row = 0; row < model->rowCount(); ++row) {
-        for (int column = 0; column < model->columnCount();
-             ++column) {
+        for (int column = 0; column < model->columnCount(); ++column) {
             double value = gridSpecification.randomInitialValue ?
                     randomValue(): gridSpecification.initialValue;
             StandardItem *item = new StandardItem(value);
@@ -398,8 +395,7 @@ bool MainWindow::fileSave()
         return false;
     QTextStream out(&file);
     for (int row = 0; row < model->rowCount(); ++row) {
-        for (int column = 0; column < model->columnCount();
-             ++column) {
+        for (int column = 0; column < model->columnCount();++column) {
             out << model->item(row, column)->text();
             if (column + 1 < model->columnCount())
                 out << Separator;
@@ -572,8 +568,7 @@ const QList<SurrogateItem> MainWindow::allSurrogateItems() const
     if (cacheIsDirty) {
         items.clear();
         for (int row = 0; row < model->rowCount(); ++row) {
-            for (int column = 0; column < model->columnCount();
-                 ++column) {
+            for (int column = 0; column < model->columnCount(); ++column) {
                 double value = model->item(row, column)->
                         data(Qt::EditRole).toDouble();
                 items << SurrogateItem(row, column, value);
@@ -590,8 +585,7 @@ QList<SurrogateItem> MainWindow::selectedSurrogateItems() const
     QList<SurrogateItem> items;
     QItemSelectionModel *selectionModel = view->selectionModel();
     for (int row = 0; row < model->rowCount(); ++row) {
-        for (int column = 0; column < model->columnCount();
-             ++column) {
+        for (int column = 0; column < model->columnCount();++column) {
             QStandardItem *item = model->item(row, column);
             if (selectionModel->isSelected(item->index())) {
                 double value = item->data(Qt::EditRole).toDouble();
