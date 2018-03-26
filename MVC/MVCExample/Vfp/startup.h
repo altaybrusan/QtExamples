@@ -6,6 +6,7 @@ namespace VirtualFrontPanel {
 
     class MainView;
     class SetupTab;
+    class Instrument;
 
     class Startup final:public QObject
     {
@@ -17,11 +18,14 @@ namespace VirtualFrontPanel {
         ~Startup();
 
     private:
+        SetupTab& m_setupTab;
+        MainView& m_mainView;
+        Instrument* m_instrument;
+
         explicit Startup(const Startup& rhs)=delete;
         Startup& operator=(const Startup& rhs)=delete;
 
-        SetupTab& m_setupTab;
-        MainView& m_mainView;
+
     };
 }
 

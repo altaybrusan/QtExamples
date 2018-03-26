@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,14 +29,20 @@ SOURCES += \
         View/setuptab.cpp \
     utils.cpp \
     startup.cpp \
-    Model/settings.cpp
+    Model/settings.cpp \
+    Model/provider.cpp \
+    Model/instsocket.cpp \
+    Model/instrument.cpp
 
 HEADERS += \
         View/mainview.h \
         View/setuptab.h \
     utils.h \
     startup.h \
-    Model/settings.h
+    Model/settings.h \
+    Model/provider.h \
+    Model/instsocket.h \
+    Model/instrument.h
 
 FORMS += \
         View/mainview.ui \

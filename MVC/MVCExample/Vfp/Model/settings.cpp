@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QStringListModel>
 #include <QMessageBox>
+#include <QStandardPaths>
 
 namespace VirtualFrontPanel {
 
@@ -23,11 +24,6 @@ namespace VirtualFrontPanel {
 
     }
 
-    QString Settings::ReadJsonFile()
-    {
-        auto default_settings= ReadJsonFromInternalResources(); // if there is no user settings
-        return default_settings;
-    }
 
     void Settings::SendErrorMessage(const QString &msg)
     {
@@ -74,16 +70,81 @@ namespace VirtualFrontPanel {
         m_applicationShortName=json_obj["appShortName"].toString();
         m_hostName=json_obj["hostname"].toString();
         m_portNumber=json_obj["port"].toInt();
-        m_waitMs=json_obj["tcpLongWaitMs"].toInt();
-        m_readWaitMs=json_obj["tcpShortWaitMs"].toInt();
+        m_longWaitMs=json_obj["tcpLongWaitMs"].toInt();
+        m_shortWaitMs=json_obj["tcpShortWaitMs"].toInt();
         SetupCommands(json_obj);
 
     }
 
+    QString Settings::ReadJsonFile()
+    {
+        auto default_settings= ReadJsonFromInternalResources(); // if there is no user settings
+        QDir config_dir = OpenConfigDirectory();
+        auto path = config_dir.filePath(m_fileName);
+        QFile std_file(path);
+        if(std_file.exists())
+        {
+            if(!std_file.open(QFile::ReadOnly|QFile::Text))
+            {
+                SendErrorMessage("Could not open: "+ path);
+                return default_settings;
+            }
+            QString settings=std_file.readAll();
+            std_file.close();
+            return settings;
+        }
+        else
+        {
+            WriteDefaultsToStdConfig(std_file,default_settings);
+            return default_settings;
+        }
+     }
+
+    QDir Settings::OpenConfigDirectory()
+    {
+        // please give me the location in which
+        // I can save my config files.
+        // This location is platform independent.
+        QDir config_dir(QStandardPaths::writableLocation(
+                            QStandardPaths::ConfigLocation));
+        // if the location is empty you should handle it.
+        // Not shown here.
+        if(!config_dir.exists()) // make sure the path really exists
+        {
+            QDir dir;
+            dir.mkpath(config_dir.path()); // make all leading folder in the path.
+                                           // You should check if it works fine or not. Not shown here
+        }
+
+        return config_dir;
+    }
+
+    void Settings::WriteDefaultsToStdConfig(QFile &stdConfigFile,
+                                            const QString &settings)
+    {
+        int length = settings.length();
+        if(!stdConfigFile.open(QFile::WriteOnly|QFile::Text))
+        {
+            SendErrorMessage("Could not open file to write -"+ stdConfigFile.fileName());
+        }
+        auto bytes_written = stdConfigFile.write(qPrintable(settings),length);
+        if(bytes_written != length)
+        {
+            SendErrorMessage("Could not wite the settings to -"+stdConfigFile.fileName());
+            if(!stdConfigFile.remove())
+            {
+                SendErrorMessage("Could not remove configuration file. Please delete remove file manually -" +
+                                 stdConfigFile.fileName());
+            }
+        }
+        stdConfigFile.close();
+
+    }
+
+
     // Row_Json<<QString>> ---> JSonDocument ---> JsonObject
     //                     ---> JSonError
     // < JsonObject, JSonError > ---> RETURNED
-
     JsonObjErrPair Settings::GetJsonObject(const QString& rawJson)
     {
 
@@ -115,5 +176,7 @@ namespace VirtualFrontPanel {
         }
         m_modelCommands.setStringList(cmd_list);
     }
+
+
 
 }
