@@ -97,7 +97,7 @@ namespace VirtualFrontPanel {
         m_instSocket.SetHostName(hostName);
     }
 
-    void Instrument::onPortNameChanged(quint16 port)
+    void Instrument::onPortChanged(quint16 port)
     {
         m_instSocket.SetPort(port);
     }

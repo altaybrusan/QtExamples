@@ -31,7 +31,7 @@ namespace VirtualFrontPanel {
 
     public slots:
         void onHostNameChanged(const QString& hostName);
-        void onPortNameChanged(quint16 port);
+        void onPortChanged(quint16 port);
         void onConnected();
         void onDisconnected();
         void onSendRequest(const QString& dataToSend);

@@ -6,17 +6,19 @@
 #include "Model/provider.h"
 #include "Model/instsocket.h"
 #include "Model/instrument.h"
+#include "ViewMgr/setupviewmanager.h"
 
 namespace VirtualFrontPanel {
     Startup::Startup() :
         QObject(nullptr),
         m_setupTab(*new SetupTab(nullptr)),
         m_mainView(*new MainView(nullptr,m_setupTab)),
-        m_instrument(new Instrument(this,*new InstSocket(this)))
+        m_instrument(new Instrument(this,*new InstSocket(this))),
+        m_setupViewMgr(new SetupViewManager(this,m_setupTab,
+                                        *m_instrument,
+                                        Provider::GetSettingsAsSingleton()))
     {
-        // TODO remove when testing is done
-        Settings& my_settings= Provider::GetSettingsAsSingleton();
-        my_settings.ParsJsonData();
+
     }
     void Startup::Show() const
     {

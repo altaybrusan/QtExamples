@@ -25,7 +25,7 @@ namespace VirtualFrontPanel {
         quint16 GetPortNumber() const {return m_portNumber;}
         int GetShortWaitMs() const {return m_shortWaitMs;}
         int GetLongWaitMs() const {return m_longWaitMs;}
-        QStringListModel& getCommandAsModel() const {return m_modelCommands;}
+        QStringListModel& getCommandsAsModel() const {return m_modelCommands;}
 
 
     signals:
