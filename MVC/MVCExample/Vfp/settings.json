@@ -1,0 +1,19 @@
+{
+"applicationTitle": "Virtual Front Panel - Gating Controller",
+"appShortName": "VFP",
+"hostname":"localhost",
+"port":23,
+"tcpLongWaitMs":1000,
+"tcpShortWaitMs":23,
+"commands":[
+  "ID?;",
+  "Reset;",
+  "Clear;",
+  "Error?;",
+  "ErrorAll?;",
+  "Pulse:Width",
+  "Pulse:Delay",
+  "MOD",
+  "EnableSynth"
+  ]
+}

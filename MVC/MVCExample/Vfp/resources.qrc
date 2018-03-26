@@ -9,4 +9,7 @@
         <file>images/controlpanel.png</file>
         <file>images/settings.png</file>
     </qresource>
+    <qresource prefix="/json">
+        <file>settings.json</file>
+    </qresource>
 </RCC>

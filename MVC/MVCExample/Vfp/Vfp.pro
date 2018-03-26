@@ -21,20 +21,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-#QMAKE_CXXFLAGS += -std=c++11
-
+#QMAKE_CXXFLAGS += -std=c++14
+CONFIG += c++11
 SOURCES += \
         main.cpp \
         View/mainview.cpp \
         View/setuptab.cpp \
     utils.cpp \
-    startup.cpp
+    startup.cpp \
+    Model/settings.cpp
 
 HEADERS += \
         View/mainview.h \
         View/setuptab.h \
     utils.h \
-    startup.h
+    startup.h \
+    Model/settings.h
 
 FORMS += \
         View/mainview.ui \
@@ -42,3 +44,5 @@ FORMS += \
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES +=
