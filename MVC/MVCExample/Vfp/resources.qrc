@@ -8,6 +8,8 @@
         <file>images/send.png</file>
         <file>images/controlpanel.png</file>
         <file>images/settings.png</file>
+        <file>images/about.png</file>
+        <file>images/exit.png</file>
     </qresource>
     <qresource prefix="/json">
         <file>settings.json</file>

@@ -28,7 +28,7 @@ namespace VirtualFrontPanel {
         m_instrument.SetShortWaitMs(short_time);
         emit NotifyStatusUpdated(tr("Long wait time Ms: %1").arg(long_time));
         emit NotifyStatusUpdated(tr("Short wait time Ms: %1").arg(short_time));
-        onDisconnected(); // initial state
+        //onDisconnected(); // initial state, shifted to Startup
     }
 
     SetupViewManager::~SetupViewManager()

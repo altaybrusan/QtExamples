@@ -33,7 +33,10 @@ SOURCES += \
     Model/provider.cpp \
     Model/instsocket.cpp \
     Model/instrument.cpp \
-    ViewMgr/setupviewmanager.cpp
+    ViewMgr/setupviewmanager.cpp \
+    View/controltab.cpp \
+    ViewMgr/controltabviewmanager.cpp \
+    View/aboutbox.cpp
 
 HEADERS += \
         View/mainview.h \
@@ -44,11 +47,16 @@ HEADERS += \
     Model/provider.h \
     Model/instsocket.h \
     Model/instrument.h \
-    ViewMgr/setupviewmanager.h
+    ViewMgr/setupviewmanager.h \
+    View/controltab.h \
+    ViewMgr/controltabviewmanager.h \
+    View/aboutbox.h
 
 FORMS += \
         View/mainview.ui \
-        View/setuptab.ui
+        View/setuptab.ui \
+    View/controltab.ui \
+    View/aboutbox.ui
 
 RESOURCES += \
     resources.qrc

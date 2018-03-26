@@ -10,9 +10,11 @@
 #include <QStringListModel>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <QDebug>
 
 namespace VirtualFrontPanel {
 
+    static const int PW_CMD_INDEX =5;
     static auto RESOURCE_PREFIX=QStringLiteral(":/json");
 
     Settings::Settings(QObject *parent, QString fileName):
@@ -175,6 +177,20 @@ namespace VirtualFrontPanel {
             cmd_list.append(item.toString());
         }
         m_modelCommands.setStringList(cmd_list);
+        // just to show how to use model
+        auto index = m_modelCommands.index(PW_CMD_INDEX);
+        auto test_cmd =m_modelCommands.data(index,Qt::DisplayRole);
+        qDebug()<<"Test command the hard way"<<test_cmd.toString();
+
+        // in this example this is a simpler way!
+        if(PW_CMD_INDEX<cmd_list.size())
+        {
+            m_pwCommand=cmd_list[PW_CMD_INDEX];
+        }
+        else
+        {
+            emit NotifyStatusMessage("unable to get pulse width commands");
+        }
     }
 
 

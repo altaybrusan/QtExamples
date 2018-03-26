@@ -14,7 +14,7 @@ namespace VirtualFrontPanel {
         explicit Instrument(QObject *parent ,InstSocket& socket);
         virtual ~Instrument();
         void Connect();
-        void Disconnect();
+        void Disconnect() const;
         bool IsConnected() const;
         QString GetHostName() const;
         quint16 GetPort() const;
@@ -22,12 +22,12 @@ namespace VirtualFrontPanel {
         void SetShortWaitMs(int value);
 
     signals:
-        void NotifyConnected();
-        void NotifyDisconnected();
-        void NotifyDataSent(const QString& datasent);
-        void NotifyDataReceived(const QString& readData);
-        void NotifyErrorDetected(const QString& errorMsg);
-        void NotifyStatusUpdated(const QString& statusMsg);
+        void NotifyConnected() const;
+        void NotifyDisconnected() const;
+        void NotifyDataSent(const QString& datasent) const;
+        void NotifyDataReceived(const QString& readData) const;
+        void NotifyErrorDetected(const QString& errorMsg) const;
+        void NotifyStatusUpdated(const QString& statusMsg) const;
 
     public slots:
         void onHostNameChanged(const QString& hostName);
@@ -36,6 +36,7 @@ namespace VirtualFrontPanel {
         void onDisconnected();
         void onSendRequest(const QString& dataToSend);
         void onReceiveRequest();
+        void onPulseWidthChanged(double value);
 
 
     private:

@@ -2,6 +2,8 @@
 #include "Model/instsocket.h"
 #include "utils.h"
 #include <QDebug>
+#include "Model/provider.h"
+#include "Model/settings.h"
 
 namespace VirtualFrontPanel {
     Instrument::Instrument(QObject *parent, InstSocket& socket) :
@@ -46,11 +48,15 @@ namespace VirtualFrontPanel {
     }
 
 
-    void Instrument::Disconnect()
+    void Instrument::Disconnect() const
     {
         if(m_instSocket.IsOpen())
         {
             m_instSocket.Disconnect();
+        }
+        else
+        {
+            emit NotifyDisconnected();
         }
     }
     void Instrument::onDisconnected()
@@ -78,6 +84,16 @@ namespace VirtualFrontPanel {
         {
             emit NotifyDataReceived(input_buffer);
         }
+    }
+
+    void Instrument::onPulseWidthChanged(double value)
+    {
+        Settings& _settings = Provider::GetSettingsAsSingleton();
+        auto pw_cmd = _settings.getPwCommand() + "%1;";
+        auto full_cmd = pw_cmd.arg(value);
+        m_instSocket.WriteData(full_cmd);
+        emit NotifyStatusUpdated(full_cmd);
+
     }
 
 

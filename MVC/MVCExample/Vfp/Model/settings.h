@@ -26,17 +26,13 @@ namespace VirtualFrontPanel {
         int GetShortWaitMs() const {return m_shortWaitMs;}
         int GetLongWaitMs() const {return m_longWaitMs;}
         QStringListModel& getCommandsAsModel() const {return m_modelCommands;}
+        QString getPwCommand() const {return m_pwCommand;}
 
 
     signals:
         void NotifyStatusMessage(QString message);
 
     private:
-        QString m_fileName;
-        QString ReadJsonFile();
-        void SendErrorMessage(const QString& msg);
-        QString ReadJsonFromInternalResources();
-
 
         QString m_applicationName;
         QString m_applicationShortName;
@@ -45,6 +41,15 @@ namespace VirtualFrontPanel {
         int m_longWaitMs;
         int m_shortWaitMs;
         QStringListModel& m_modelCommands;
+        QString m_pwCommand;
+
+        QString m_fileName;
+        QString ReadJsonFile();
+        void SendErrorMessage(const QString& msg);
+        QString ReadJsonFromInternalResources();
+
+
+
 
 
         JsonObjErrPair GetJsonObject(const QString &rawJson);
